@@ -1,3 +1,4 @@
 /target
 /rpc/target
 .idea
+minikv.log
