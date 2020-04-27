@@ -1,5 +1,7 @@
 syntax = "proto3";
-
+// todo: since the key and value size are fixed, true using fixed-length elements
+// eg. u64
+// todo: return error message
 message GetRequest {
     bytes key = 1;
 }

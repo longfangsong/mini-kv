@@ -9,6 +9,7 @@ rpc = { path = "rpc" }
 grpcio = "0.5.1"
 futures = {version = "0.3.4", features = ["compat"]}
 futures01 = { package = "futures", version = "0.1"}
+futures-locks = "0.5.0"
 
 [[bin]]
 name = "server"
