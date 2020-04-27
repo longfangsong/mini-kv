@@ -3,7 +3,7 @@ use std::sync::Arc;
 use rpc::minikv_grpc::MiniKvServerClient;
 use rpc::minikv::{GetRequest, PutRequest, DeleteRequest, GetResponse, PutResponse, DeleteResponse, ScanResponse, ScanRequest};
 use std::io::{stdin, BufRead, stdout};
-use std::str::from_utf8;
+use std::str::{from_utf8, FromStr};
 use std::io::Write;
 
 fn main() {
@@ -64,14 +64,11 @@ fn main() {
             }
             "scan" => {
                 let mut request = ScanRequest::default();
-                let key_str = command_and_arg_iter.next().unwrap().as_bytes();
-                let mut key = vec![];
-                for i in 0..8 {
-                    key.push(key_str.get(i).cloned().unwrap_or(0x00u8))
-                }
+                let key_str = command_and_arg_iter.next().unwrap();
+                let key = u64::from_str(key_str).unwrap();
                 request.set_cursor(key);
                 let response = client.scan(&request).unwrap();
-                println!("cursor: {}", from_utf8(&response.cursor).unwrap());
+                println!("cursor: {}", response.cursor);
                 for (i, key) in response.result.iter().enumerate() {
                     println!("({}): {}", i, from_utf8(key).unwrap());
                 }

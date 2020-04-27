@@ -1035,7 +1035,7 @@ impl ::protobuf::reflect::ProtobufValue for DeleteResponse {
 #[derive(PartialEq,Clone,Default)]
 pub struct ScanRequest {
     // message fields
-    pub cursor: ::std::vec::Vec<u8>,
+    pub cursor: u64,
     // special fields
     pub unknown_fields: ::protobuf::UnknownFields,
     pub cached_size: ::protobuf::CachedSize,
@@ -1052,30 +1052,19 @@ impl ScanRequest {
         ::std::default::Default::default()
     }
 
-    // bytes cursor = 1;
+    // uint64 cursor = 1;
 
 
-    pub fn get_cursor(&self) -> &[u8] {
-        &self.cursor
+    pub fn get_cursor(&self) -> u64 {
+        self.cursor
     }
     pub fn clear_cursor(&mut self) {
-        self.cursor.clear();
+        self.cursor = 0;
     }
 
     // Param is passed by value, moved
-    pub fn set_cursor(&mut self, v: ::std::vec::Vec<u8>) {
+    pub fn set_cursor(&mut self, v: u64) {
         self.cursor = v;
-    }
-
-    // Mutable pointer to the field.
-    // If field is not initialized, it is initialized with default value first.
-    pub fn mut_cursor(&mut self) -> &mut ::std::vec::Vec<u8> {
-        &mut self.cursor
-    }
-
-    // Take field
-    pub fn take_cursor(&mut self) -> ::std::vec::Vec<u8> {
-        ::std::mem::replace(&mut self.cursor, ::std::vec::Vec::new())
     }
 }
 
@@ -1089,7 +1078,11 @@ impl ::protobuf::Message for ScanRequest {
             let (field_number, wire_type) = is.read_tag_unpack()?;
             match field_number {
                 1 => {
-                    ::protobuf::rt::read_singular_proto3_bytes_into(wire_type, is, &mut self.cursor)?;
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_uint64()?;
+                    self.cursor = tmp;
                 },
                 _ => {
                     ::protobuf::rt::read_unknown_or_skip_group(field_number, wire_type, is, self.mut_unknown_fields())?;
@@ -1103,8 +1096,8 @@ impl ::protobuf::Message for ScanRequest {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u32 {
         let mut my_size = 0;
-        if !self.cursor.is_empty() {
-            my_size += ::protobuf::rt::bytes_size(1, &self.cursor);
+        if self.cursor != 0 {
+            my_size += ::protobuf::rt::value_size(1, self.cursor, ::protobuf::wire_format::WireTypeVarint);
         }
         my_size += ::protobuf::rt::unknown_fields_size(self.get_unknown_fields());
         self.cached_size.set(my_size);
@@ -1112,8 +1105,8 @@ impl ::protobuf::Message for ScanRequest {
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::ProtobufResult<()> {
-        if !self.cursor.is_empty() {
-            os.write_bytes(1, &self.cursor)?;
+        if self.cursor != 0 {
+            os.write_uint64(1, self.cursor)?;
         }
         os.write_unknown_fields(self.get_unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -1154,7 +1147,7 @@ impl ::protobuf::Message for ScanRequest {
         unsafe {
             descriptor.get(|| {
                 let mut fields = ::std::vec::Vec::new();
-                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeBytes>(
+                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeUint64>(
                     "cursor",
                     |m: &ScanRequest| { &m.cursor },
                     |m: &mut ScanRequest| { &mut m.cursor },
@@ -1178,7 +1171,7 @@ impl ::protobuf::Message for ScanRequest {
 
 impl ::protobuf::Clear for ScanRequest {
     fn clear(&mut self) {
-        self.cursor.clear();
+        self.cursor = 0;
         self.unknown_fields.clear();
     }
 }
@@ -1198,7 +1191,7 @@ impl ::protobuf::reflect::ProtobufValue for ScanRequest {
 #[derive(PartialEq,Clone,Default)]
 pub struct ScanResponse {
     // message fields
-    pub cursor: ::std::vec::Vec<u8>,
+    pub cursor: u64,
     pub result: ::protobuf::RepeatedField<::std::vec::Vec<u8>>,
     // special fields
     pub unknown_fields: ::protobuf::UnknownFields,
@@ -1216,30 +1209,19 @@ impl ScanResponse {
         ::std::default::Default::default()
     }
 
-    // bytes cursor = 1;
+    // uint64 cursor = 1;
 
 
-    pub fn get_cursor(&self) -> &[u8] {
-        &self.cursor
+    pub fn get_cursor(&self) -> u64 {
+        self.cursor
     }
     pub fn clear_cursor(&mut self) {
-        self.cursor.clear();
+        self.cursor = 0;
     }
 
     // Param is passed by value, moved
-    pub fn set_cursor(&mut self, v: ::std::vec::Vec<u8>) {
+    pub fn set_cursor(&mut self, v: u64) {
         self.cursor = v;
-    }
-
-    // Mutable pointer to the field.
-    // If field is not initialized, it is initialized with default value first.
-    pub fn mut_cursor(&mut self) -> &mut ::std::vec::Vec<u8> {
-        &mut self.cursor
-    }
-
-    // Take field
-    pub fn take_cursor(&mut self) -> ::std::vec::Vec<u8> {
-        ::std::mem::replace(&mut self.cursor, ::std::vec::Vec::new())
     }
 
     // repeated bytes result = 2;
@@ -1278,7 +1260,11 @@ impl ::protobuf::Message for ScanResponse {
             let (field_number, wire_type) = is.read_tag_unpack()?;
             match field_number {
                 1 => {
-                    ::protobuf::rt::read_singular_proto3_bytes_into(wire_type, is, &mut self.cursor)?;
+                    if wire_type != ::protobuf::wire_format::WireTypeVarint {
+                        return ::std::result::Result::Err(::protobuf::rt::unexpected_wire_type(wire_type));
+                    }
+                    let tmp = is.read_uint64()?;
+                    self.cursor = tmp;
                 },
                 2 => {
                     ::protobuf::rt::read_repeated_bytes_into(wire_type, is, &mut self.result)?;
@@ -1295,8 +1281,8 @@ impl ::protobuf::Message for ScanResponse {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u32 {
         let mut my_size = 0;
-        if !self.cursor.is_empty() {
-            my_size += ::protobuf::rt::bytes_size(1, &self.cursor);
+        if self.cursor != 0 {
+            my_size += ::protobuf::rt::value_size(1, self.cursor, ::protobuf::wire_format::WireTypeVarint);
         }
         for value in &self.result {
             my_size += ::protobuf::rt::bytes_size(2, &value);
@@ -1307,8 +1293,8 @@ impl ::protobuf::Message for ScanResponse {
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::ProtobufResult<()> {
-        if !self.cursor.is_empty() {
-            os.write_bytes(1, &self.cursor)?;
+        if self.cursor != 0 {
+            os.write_uint64(1, self.cursor)?;
         }
         for v in &self.result {
             os.write_bytes(2, &v)?;
@@ -1352,7 +1338,7 @@ impl ::protobuf::Message for ScanResponse {
         unsafe {
             descriptor.get(|| {
                 let mut fields = ::std::vec::Vec::new();
-                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeBytes>(
+                fields.push(::protobuf::reflect::accessor::make_simple_field_accessor::<_, ::protobuf::types::ProtobufTypeUint64>(
                     "cursor",
                     |m: &ScanResponse| { &m.cursor },
                     |m: &mut ScanResponse| { &mut m.cursor },
@@ -1381,7 +1367,7 @@ impl ::protobuf::Message for ScanResponse {
 
 impl ::protobuf::Clear for ScanResponse {
     fn clear(&mut self) {
-        self.cursor.clear();
+        self.cursor = 0;
         self.result.clear();
         self.unknown_fields.clear();
     }
@@ -1407,68 +1393,71 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x12\x18\n\x07success\x18\x01\x20\x01(\x08R\x07success\"!\n\rDeleteReque\
     st\x12\x10\n\x03key\x18\x01\x20\x01(\x0cR\x03key\"*\n\x0eDeleteResponse\
     \x12\x18\n\x07success\x18\x01\x20\x01(\x08R\x07success\"%\n\x0bScanReque\
-    st\x12\x16\n\x06cursor\x18\x01\x20\x01(\x0cR\x06cursor\">\n\x0cScanRespo\
-    nse\x12\x16\n\x06cursor\x18\x01\x20\x01(\x0cR\x06cursor\x12\x16\n\x06res\
+    st\x12\x16\n\x06cursor\x18\x01\x20\x01(\x04R\x06cursor\">\n\x0cScanRespo\
+    nse\x12\x16\n\x06cursor\x18\x01\x20\x01(\x04R\x06cursor\x12\x16\n\x06res\
     ult\x18\x02\x20\x03(\x0cR\x06result2\xaa\x01\n\x0cMiniKVServer\x12\"\n\
     \x03Get\x12\x0b.GetRequest\x1a\x0c.GetResponse\"\0\x12\"\n\x03Put\x12\
     \x0b.PutRequest\x1a\x0c.PutResponse\"\0\x12+\n\x06Delete\x12\x0e.DeleteR\
     equest\x1a\x0f.DeleteResponse\"\0\x12%\n\x04Scan\x12\x0c.ScanRequest\x1a\
-    \r.ScanResponse\"\0J\x85\t\n\x06\x12\x04\0\0-\x01\n\x08\n\x01\x0c\x12\
-    \x03\0\0\x12\n\n\n\x02\x04\0\x12\x04\x02\0\x04\x01\n\n\n\x03\x04\0\x01\
-    \x12\x03\x02\x08\x12\n\x0b\n\x04\x04\0\x02\0\x12\x03\x03\x04\x12\n\r\n\
-    \x05\x04\0\x02\0\x04\x12\x04\x03\x04\x02\x14\n\x0c\n\x05\x04\0\x02\0\x05\
-    \x12\x03\x03\x04\t\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\x03\n\r\n\x0c\n\
-    \x05\x04\0\x02\0\x03\x12\x03\x03\x10\x11\n\n\n\x02\x04\x01\x12\x04\x06\0\
-    \x08\x01\n\n\n\x03\x04\x01\x01\x12\x03\x06\x08\x13\n\x0b\n\x04\x04\x01\
-    \x02\0\x12\x03\x07\x04\x14\n\r\n\x05\x04\x01\x02\0\x04\x12\x04\x07\x04\
-    \x06\x15\n\x0c\n\x05\x04\x01\x02\0\x05\x12\x03\x07\x04\t\n\x0c\n\x05\x04\
-    \x01\x02\0\x01\x12\x03\x07\n\x0f\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03\
-    \x07\x12\x13\n\n\n\x02\x04\x02\x12\x04\n\0\r\x01\n\n\n\x03\x04\x02\x01\
-    \x12\x03\n\x08\x12\n\x0b\n\x04\x04\x02\x02\0\x12\x03\x0b\x04\x12\n\r\n\
-    \x05\x04\x02\x02\0\x04\x12\x04\x0b\x04\n\x14\n\x0c\n\x05\x04\x02\x02\0\
-    \x05\x12\x03\x0b\x04\t\n\x0c\n\x05\x04\x02\x02\0\x01\x12\x03\x0b\n\r\n\
-    \x0c\n\x05\x04\x02\x02\0\x03\x12\x03\x0b\x10\x11\n\x0b\n\x04\x04\x02\x02\
-    \x01\x12\x03\x0c\x04\x14\n\r\n\x05\x04\x02\x02\x01\x04\x12\x04\x0c\x04\
-    \x0b\x12\n\x0c\n\x05\x04\x02\x02\x01\x05\x12\x03\x0c\x04\t\n\x0c\n\x05\
-    \x04\x02\x02\x01\x01\x12\x03\x0c\n\x0f\n\x0c\n\x05\x04\x02\x02\x01\x03\
-    \x12\x03\x0c\x12\x13\n\n\n\x02\x04\x03\x12\x04\x0f\0\x11\x01\n\n\n\x03\
-    \x04\x03\x01\x12\x03\x0f\x08\x13\n\x0b\n\x04\x04\x03\x02\0\x12\x03\x10\
-    \x04\x15\n\r\n\x05\x04\x03\x02\0\x04\x12\x04\x10\x04\x0f\x15\n\x0c\n\x05\
-    \x04\x03\x02\0\x05\x12\x03\x10\x04\x08\n\x0c\n\x05\x04\x03\x02\0\x01\x12\
-    \x03\x10\t\x10\n\x0c\n\x05\x04\x03\x02\0\x03\x12\x03\x10\x13\x14\n\n\n\
-    \x02\x04\x04\x12\x04\x13\0\x15\x01\n\n\n\x03\x04\x04\x01\x12\x03\x13\x08\
-    \x15\n\x0b\n\x04\x04\x04\x02\0\x12\x03\x14\x04\x12\n\r\n\x05\x04\x04\x02\
-    \0\x04\x12\x04\x14\x04\x13\x17\n\x0c\n\x05\x04\x04\x02\0\x05\x12\x03\x14\
-    \x04\t\n\x0c\n\x05\x04\x04\x02\0\x01\x12\x03\x14\n\r\n\x0c\n\x05\x04\x04\
-    \x02\0\x03\x12\x03\x14\x10\x11\n\n\n\x02\x04\x05\x12\x04\x17\0\x19\x01\n\
-    \n\n\x03\x04\x05\x01\x12\x03\x17\x08\x16\n\x0b\n\x04\x04\x05\x02\0\x12\
-    \x03\x18\x04\x15\n\r\n\x05\x04\x05\x02\0\x04\x12\x04\x18\x04\x17\x18\n\
-    \x0c\n\x05\x04\x05\x02\0\x05\x12\x03\x18\x04\x08\n\x0c\n\x05\x04\x05\x02\
-    \0\x01\x12\x03\x18\t\x10\n\x0c\n\x05\x04\x05\x02\0\x03\x12\x03\x18\x13\
-    \x14\n\n\n\x02\x04\x06\x12\x04\x1b\0\x1d\x01\n\n\n\x03\x04\x06\x01\x12\
-    \x03\x1b\x08\x13\n\x0b\n\x04\x04\x06\x02\0\x12\x03\x1c\x04\x15\n\r\n\x05\
-    \x04\x06\x02\0\x04\x12\x04\x1c\x04\x1b\x15\n\x0c\n\x05\x04\x06\x02\0\x05\
-    \x12\x03\x1c\x04\t\n\x0c\n\x05\x04\x06\x02\0\x01\x12\x03\x1c\n\x10\n\x0c\
-    \n\x05\x04\x06\x02\0\x03\x12\x03\x1c\x13\x14\n\n\n\x02\x04\x07\x12\x04\
-    \x1f\0\"\x01\n\n\n\x03\x04\x07\x01\x12\x03\x1f\x08\x14\n\x0b\n\x04\x04\
-    \x07\x02\0\x12\x03\x20\x04\x15\n\r\n\x05\x04\x07\x02\0\x04\x12\x04\x20\
-    \x04\x1f\x16\n\x0c\n\x05\x04\x07\x02\0\x05\x12\x03\x20\x04\t\n\x0c\n\x05\
-    \x04\x07\x02\0\x01\x12\x03\x20\n\x10\n\x0c\n\x05\x04\x07\x02\0\x03\x12\
-    \x03\x20\x13\x14\n\x0b\n\x04\x04\x07\x02\x01\x12\x03!\x04\x1e\n\x0c\n\
-    \x05\x04\x07\x02\x01\x04\x12\x03!\x04\x0c\n\x0c\n\x05\x04\x07\x02\x01\
-    \x05\x12\x03!\r\x12\n\x0c\n\x05\x04\x07\x02\x01\x01\x12\x03!\x13\x19\n\
-    \x0c\n\x05\x04\x07\x02\x01\x03\x12\x03!\x1c\x1d\n\n\n\x02\x06\0\x12\x04$\
-    \0-\x01\n\n\n\x03\x06\0\x01\x12\x03$\x08\x14\n\x0c\n\x04\x06\0\x02\0\x12\
-    \x04%\x04&\x05\n\x0c\n\x05\x06\0\x02\0\x01\x12\x03%\x08\x0b\n\x0c\n\x05\
-    \x06\0\x02\0\x02\x12\x03%\r\x17\n\x0c\n\x05\x06\0\x02\0\x03\x12\x03%\"-\
-    \n\x0c\n\x04\x06\0\x02\x01\x12\x04'\x04(\x05\n\x0c\n\x05\x06\0\x02\x01\
-    \x01\x12\x03'\x08\x0b\n\x0c\n\x05\x06\0\x02\x01\x02\x12\x03'\r\x17\n\x0c\
-    \n\x05\x06\0\x02\x01\x03\x12\x03'\"-\n\x0c\n\x04\x06\0\x02\x02\x12\x04)\
-    \x04*\x05\n\x0c\n\x05\x06\0\x02\x02\x01\x12\x03)\x08\x0e\n\x0c\n\x05\x06\
-    \0\x02\x02\x02\x12\x03)\x10\x1d\n\x0c\n\x05\x06\0\x02\x02\x03\x12\x03)(6\
-    \n\x0c\n\x04\x06\0\x02\x03\x12\x04+\x04,\x05\n\x0c\n\x05\x06\0\x02\x03\
-    \x01\x12\x03+\x08\x0c\n\x0c\n\x05\x06\0\x02\x03\x02\x12\x03+\x0e\x19\n\
-    \x0c\n\x05\x06\0\x02\x03\x03\x12\x03+$0b\x06proto3\
+    \r.ScanResponse\"\0J\xfd\t\n\x06\x12\x04\0\0/\x01\n\x08\n\x01\x0c\x12\
+    \x03\0\0\x12\n\x81\x01\n\x02\x04\0\x12\x04\x04\0\x06\x01\x1au\x20todo:\
+    \x20since\x20the\x20key\x20and\x20value\x20size\x20are\x20fixed,\x20true\
+    \x20using\x20fixed-length\x20elements\n\x20eg.\x20u64\n\x20todo:\x20retu\
+    rn\x20error\x20message\n\n\n\n\x03\x04\0\x01\x12\x03\x04\x08\x12\n\x0b\n\
+    \x04\x04\0\x02\0\x12\x03\x05\x04\x12\n\r\n\x05\x04\0\x02\0\x04\x12\x04\
+    \x05\x04\x04\x14\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\x05\x04\t\n\x0c\n\
+    \x05\x04\0\x02\0\x01\x12\x03\x05\n\r\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\
+    \x05\x10\x11\n\n\n\x02\x04\x01\x12\x04\x08\0\n\x01\n\n\n\x03\x04\x01\x01\
+    \x12\x03\x08\x08\x13\n\x0b\n\x04\x04\x01\x02\0\x12\x03\t\x04\x14\n\r\n\
+    \x05\x04\x01\x02\0\x04\x12\x04\t\x04\x08\x15\n\x0c\n\x05\x04\x01\x02\0\
+    \x05\x12\x03\t\x04\t\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03\t\n\x0f\n\x0c\
+    \n\x05\x04\x01\x02\0\x03\x12\x03\t\x12\x13\n\n\n\x02\x04\x02\x12\x04\x0c\
+    \0\x0f\x01\n\n\n\x03\x04\x02\x01\x12\x03\x0c\x08\x12\n\x0b\n\x04\x04\x02\
+    \x02\0\x12\x03\r\x04\x12\n\r\n\x05\x04\x02\x02\0\x04\x12\x04\r\x04\x0c\
+    \x14\n\x0c\n\x05\x04\x02\x02\0\x05\x12\x03\r\x04\t\n\x0c\n\x05\x04\x02\
+    \x02\0\x01\x12\x03\r\n\r\n\x0c\n\x05\x04\x02\x02\0\x03\x12\x03\r\x10\x11\
+    \n\x0b\n\x04\x04\x02\x02\x01\x12\x03\x0e\x04\x14\n\r\n\x05\x04\x02\x02\
+    \x01\x04\x12\x04\x0e\x04\r\x12\n\x0c\n\x05\x04\x02\x02\x01\x05\x12\x03\
+    \x0e\x04\t\n\x0c\n\x05\x04\x02\x02\x01\x01\x12\x03\x0e\n\x0f\n\x0c\n\x05\
+    \x04\x02\x02\x01\x03\x12\x03\x0e\x12\x13\n\n\n\x02\x04\x03\x12\x04\x11\0\
+    \x13\x01\n\n\n\x03\x04\x03\x01\x12\x03\x11\x08\x13\n\x0b\n\x04\x04\x03\
+    \x02\0\x12\x03\x12\x04\x15\n\r\n\x05\x04\x03\x02\0\x04\x12\x04\x12\x04\
+    \x11\x15\n\x0c\n\x05\x04\x03\x02\0\x05\x12\x03\x12\x04\x08\n\x0c\n\x05\
+    \x04\x03\x02\0\x01\x12\x03\x12\t\x10\n\x0c\n\x05\x04\x03\x02\0\x03\x12\
+    \x03\x12\x13\x14\n\n\n\x02\x04\x04\x12\x04\x15\0\x17\x01\n\n\n\x03\x04\
+    \x04\x01\x12\x03\x15\x08\x15\n\x0b\n\x04\x04\x04\x02\0\x12\x03\x16\x04\
+    \x12\n\r\n\x05\x04\x04\x02\0\x04\x12\x04\x16\x04\x15\x17\n\x0c\n\x05\x04\
+    \x04\x02\0\x05\x12\x03\x16\x04\t\n\x0c\n\x05\x04\x04\x02\0\x01\x12\x03\
+    \x16\n\r\n\x0c\n\x05\x04\x04\x02\0\x03\x12\x03\x16\x10\x11\n\n\n\x02\x04\
+    \x05\x12\x04\x19\0\x1b\x01\n\n\n\x03\x04\x05\x01\x12\x03\x19\x08\x16\n\
+    \x0b\n\x04\x04\x05\x02\0\x12\x03\x1a\x04\x15\n\r\n\x05\x04\x05\x02\0\x04\
+    \x12\x04\x1a\x04\x19\x18\n\x0c\n\x05\x04\x05\x02\0\x05\x12\x03\x1a\x04\
+    \x08\n\x0c\n\x05\x04\x05\x02\0\x01\x12\x03\x1a\t\x10\n\x0c\n\x05\x04\x05\
+    \x02\0\x03\x12\x03\x1a\x13\x14\n\n\n\x02\x04\x06\x12\x04\x1d\0\x1f\x01\n\
+    \n\n\x03\x04\x06\x01\x12\x03\x1d\x08\x13\n\x0b\n\x04\x04\x06\x02\0\x12\
+    \x03\x1e\x04\x16\n\r\n\x05\x04\x06\x02\0\x04\x12\x04\x1e\x04\x1d\x15\n\
+    \x0c\n\x05\x04\x06\x02\0\x05\x12\x03\x1e\x04\n\n\x0c\n\x05\x04\x06\x02\0\
+    \x01\x12\x03\x1e\x0b\x11\n\x0c\n\x05\x04\x06\x02\0\x03\x12\x03\x1e\x14\
+    \x15\n\n\n\x02\x04\x07\x12\x04!\0$\x01\n\n\n\x03\x04\x07\x01\x12\x03!\
+    \x08\x14\n\x0b\n\x04\x04\x07\x02\0\x12\x03\"\x04\x16\n\r\n\x05\x04\x07\
+    \x02\0\x04\x12\x04\"\x04!\x16\n\x0c\n\x05\x04\x07\x02\0\x05\x12\x03\"\
+    \x04\n\n\x0c\n\x05\x04\x07\x02\0\x01\x12\x03\"\x0b\x11\n\x0c\n\x05\x04\
+    \x07\x02\0\x03\x12\x03\"\x14\x15\n\x0b\n\x04\x04\x07\x02\x01\x12\x03#\
+    \x04\x1e\n\x0c\n\x05\x04\x07\x02\x01\x04\x12\x03#\x04\x0c\n\x0c\n\x05\
+    \x04\x07\x02\x01\x05\x12\x03#\r\x12\n\x0c\n\x05\x04\x07\x02\x01\x01\x12\
+    \x03#\x13\x19\n\x0c\n\x05\x04\x07\x02\x01\x03\x12\x03#\x1c\x1d\n\n\n\x02\
+    \x06\0\x12\x04&\0/\x01\n\n\n\x03\x06\0\x01\x12\x03&\x08\x14\n\x0c\n\x04\
+    \x06\0\x02\0\x12\x04'\x04(\x05\n\x0c\n\x05\x06\0\x02\0\x01\x12\x03'\x08\
+    \x0b\n\x0c\n\x05\x06\0\x02\0\x02\x12\x03'\r\x17\n\x0c\n\x05\x06\0\x02\0\
+    \x03\x12\x03'\"-\n\x0c\n\x04\x06\0\x02\x01\x12\x04)\x04*\x05\n\x0c\n\x05\
+    \x06\0\x02\x01\x01\x12\x03)\x08\x0b\n\x0c\n\x05\x06\0\x02\x01\x02\x12\
+    \x03)\r\x17\n\x0c\n\x05\x06\0\x02\x01\x03\x12\x03)\"-\n\x0c\n\x04\x06\0\
+    \x02\x02\x12\x04+\x04,\x05\n\x0c\n\x05\x06\0\x02\x02\x01\x12\x03+\x08\
+    \x0e\n\x0c\n\x05\x06\0\x02\x02\x02\x12\x03+\x10\x1d\n\x0c\n\x05\x06\0\
+    \x02\x02\x03\x12\x03+(6\n\x0c\n\x04\x06\0\x02\x03\x12\x04-\x04.\x05\n\
+    \x0c\n\x05\x06\0\x02\x03\x01\x12\x03-\x08\x0c\n\x0c\n\x05\x06\0\x02\x03\
+    \x02\x12\x03-\x0e\x19\n\x0c\n\x05\x06\0\x02\x03\x03\x12\x03-$0b\x06proto\
+    3\
 ";
 
 static mut file_descriptor_proto_lazy: ::protobuf::lazy::Lazy<::protobuf::descriptor::FileDescriptorProto> = ::protobuf::lazy::Lazy::INIT;

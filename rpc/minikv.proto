@@ -28,11 +28,11 @@ message DeleteResponse {
 }
 
 message ScanRequest {
-    bytes cursor = 1;
+    uint64 cursor = 1;
 }
 
 message ScanResponse {
-    bytes cursor = 1;
+    uint64 cursor = 1;
     repeated bytes result = 2;
 }
 

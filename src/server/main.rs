@@ -100,11 +100,18 @@ impl rpc::minikv_grpc::MiniKvServer for KVServer {
 
     fn scan(&mut self, ctx: RpcContext<'_>, req: ScanRequest, sink: UnarySink<ScanResponse>) {
         let mut response = ScanResponse::default();
-        response.set_cursor(vec![0x0]);
         let f = self.store.lock()
             .then(move |it| {
                 let guard = it.unwrap();
-                let value: Vec<Vec<u8>> = guard.keys().map(|it| it.to_vec()).collect();
+                let value: Vec<Vec<u8>> = guard.keys()
+                    .skip(req.cursor as _)
+                    .take(16)
+                    .map(|it| it.to_vec()).collect();
+                if value.len() + req.cursor as usize >= guard.keys().len() {
+                    response.set_cursor(0)
+                } else {
+                    response.set_cursor(req.cursor + value.len() as u64);
+                }
                 response.set_result(value.into());
                 sink.success(response)
                     .map_err(move |e| println!("failed to reply {:?}: {:?}", req, e))
