@@ -18,37 +18,70 @@ fn main() {
         command_and_arg = command_and_arg.to_ascii_lowercase();
         let mut command_and_arg_iter = command_and_arg.split(' ').map(|it| it.trim());
         let command = command_and_arg_iter.next().unwrap();
+        // todo: separate these commands into their own function
         match command {
+            "" => {}
             "put" => {
                 let mut request = PutRequest::default();
                 // todo: warn when key_str.len() != 8
-                let key_str = command_and_arg_iter.next().unwrap().as_bytes();
-                let mut key = vec![];
-                for i in 0..8 {
-                    key.push(key_str.get(i).cloned().unwrap_or(0x00u8))
+                if let Some(arg1) = command_and_arg_iter.next() {
+                    let key_str = arg1.as_bytes();
+                    if key_str.len() != 8 {
+                        println!("waring: key must be 8 bytes long, will padding/truncate to 8 bytes")
+                    }
+                    let mut key = vec![];
+                    for i in 0..8 {
+                        key.push(key_str.get(i).cloned().unwrap_or(0x00u8))
+                    }
+                    request.set_key(key);
+                    if let Some(arg2) = command_and_arg_iter.next() {
+                        let value_str = arg2.as_bytes();
+                        if value_str.len() != 256 {
+                            println!("waring: value must be 256 bytes long, will padding/truncate to 256 bytes");
+                        }
+                        let mut value = vec![];
+                        for i in 0..256 {
+                            value.push(value_str.get(i).cloned().unwrap_or(0x00u8))
+                        }
+                        request.set_value(value);
+                        let response = client.put(&request);
+                        if let Ok(resp) = response {
+                            if !resp.get_success() {
+                                eprintln!("error: {}", resp.get_errorMessage());
+                            }
+                        } else {
+                            eprintln!("{}", response.unwrap_err());
+                        }
+                    } else {
+                        eprintln!("error: Must provide a key and a value");
+                    }
+                } else {
+                    eprintln!("error: Must provide a key and a value");
                 }
-                request.set_key(key);
-                let value_str = command_and_arg_iter.next().unwrap().as_bytes();
-                let mut value = vec![];
-                for i in 0..256 {
-                    value.push(value_str.get(i).cloned().unwrap_or(0x00u8))
-                }
-                request.set_value(value);
-                let response = client.put(&request).unwrap();
-                // todo: better error handling
-                assert!(response.success);
             }
             "get" => {
                 let mut request = GetRequest::default();
                 // todo: warn when key_str.len() != 8
-                let key_str = command_and_arg_iter.next().unwrap().as_bytes();
-                let mut key = vec![];
-                for i in 0..8 {
-                    key.push(key_str.get(i).cloned().unwrap_or(0x00u8))
+                if let Some(arg) = command_and_arg_iter.next() {
+                    let key_str = arg.as_bytes();
+                    let mut key = vec![];
+                    for i in 0..8 {
+                        key.push(key_str.get(i).cloned().unwrap_or(0x00u8))
+                    }
+                    request.set_key(key);
+                    let response = client.get(&request);
+                    if let Ok(resp) = response {
+                        if !resp.get_success() {
+                            eprintln!("error: {}", resp.get_errorMessage());
+                        } else {
+                            println!("{}", from_utf8(resp.get_value()).unwrap_or("<non-printable>"))
+                        }
+                    } else {
+                        eprintln!("{}", response.unwrap_err());
+                    }
+                } else {
+                    println!("Get command needs a key argument!")
                 }
-                request.set_key(key);
-                let response = client.get(&request).unwrap();
-                println!("{}", from_utf8(&response.value).unwrap());
             }
             "delete" => {
                 let mut request = DeleteRequest::default();
@@ -59,48 +92,37 @@ fn main() {
                     key.push(key_str.get(i).cloned().unwrap_or(0x00u8))
                 }
                 request.set_key(key);
-                let response = client.delete(&request).unwrap();
-                assert!(response.success);
+                let response = client.delete(&request);
+                if let Ok(resp) = response {
+                    if !resp.get_success() {
+                        eprintln!("error: {}", resp.get_errorMessage());
+                    }
+                } else {
+                    eprintln!("{}", response.unwrap_err());
+                }
             }
             "scan" => {
                 let mut request = ScanRequest::default();
-                let key_str = command_and_arg_iter.next().unwrap();
-                let key = u64::from_str(key_str).unwrap();
-                request.set_cursor(key);
-                let response = client.scan(&request).unwrap();
-                println!("cursor: {}", response.cursor);
-                for (i, key) in response.result.iter().enumerate() {
-                    println!("({}): {}", i, from_utf8(key).unwrap());
+                if let Some(key_str) = command_and_arg_iter.next() {
+                    if let Ok(key) = u64::from_str(key_str) {
+                        request.set_cursor(key);
+                        let response = client.scan(&request);
+                        if let Ok(resp) = response {
+                            println!("cursor: {}", resp.cursor);
+                            for (i, key) in resp.result.iter().enumerate() {
+                                println!("({}): {}", i, from_utf8(key).unwrap_or("<non-printable>"));
+                            }
+                        } else {
+                            eprintln!("{}", response.unwrap_err());
+                        }
+                    } else {
+                        eprintln!("Scan's cursor must be a number! Use 0 if you want to scan from the start.");
+                    }
+                } else {
+                    eprintln!("Scan needs a cursor! Use 0 if you want to scan from the start.");
                 }
             }
-            &_ => println!("Invalid command!")
+            &_ => println!("Invalid command")
         }
     }
-    // let mut request = PutRequest::default();
-    // request.set_key(vec![0x01u8, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08]);
-    // request.set_value(vec![0x01u8].repeat(256));
-    // let response = client.put(&request).unwrap();
-    // println!("{:?}", response);
-    // let mut request = GetRequest::default();
-    // request.set_key(vec![0x01u8, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08]);
-    // let response = client.get(&request).unwrap();
-    // println!("{:?}", response);
-    // let mut request = PutRequest::default();
-    // request.set_key(vec![0x01u8, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08]);
-    // request.set_value(vec![0x02u8].repeat(256));
-    // let response = client.put(&request).unwrap();
-    // println!("{:?}", response);
-    // let mut request = GetRequest::default();
-    // request.set_key(vec![0x01u8, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08]);
-    // let response = client.get(&request).unwrap();
-    // println!("{:?}", response);
-    // let mut request = PutRequest::default();
-    // request.set_key(vec![0x01u8, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x09]);
-    // request.set_value(vec![0x03u8].repeat(256));
-    // let response = client.put(&request).unwrap();
-    // println!("{:?}", response);
-    // let mut request = ScanRequest::default();
-    // request.set_cursor(vec![0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0]);
-    // let response = client.scan(&request).unwrap();
-    // println!("{:?}", response);
 }

@@ -6,8 +6,13 @@ message GetRequest {
     bytes key = 1;
 }
 
+// for now, we just pass the errorMessage directly
+// since errors should not happen vary frequently, this should be ok
+// change to error-code system if necessary
 message GetResponse {
-    bytes value = 1;
+    bool success = 1;
+    string errorMessage = 2;
+    bytes value = 3;
 }
 
 message PutRequest {
@@ -17,6 +22,7 @@ message PutRequest {
 
 message PutResponse {
     bool success = 1;
+    string errorMessage = 2;
 }
 
 message DeleteRequest {
@@ -25,6 +31,7 @@ message DeleteRequest {
 
 message DeleteResponse {
     bool success = 1;
+    string errorMessage = 2;
 }
 
 message ScanRequest {
