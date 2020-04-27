@@ -8,18 +8,18 @@ use std::io::Write;
 
 fn main() {
     let env = Arc::new(EnvBuilder::new().build());
-    let ch = ChannelBuilder::new(env).connect("localhost:50051");
+    let ch = ChannelBuilder::new(env).connect("localhost:5884");
     let client = MiniKvServerClient::new(ch);
     loop {
         let mut command_and_arg = String::new();
         print!(">>> ");
         stdout().flush().unwrap();
         stdin().lock().read_line(&mut command_and_arg).unwrap();
-        command_and_arg = command_and_arg.to_ascii_lowercase();
+        command_and_arg = command_and_arg;
         let mut command_and_arg_iter = command_and_arg.split(' ').map(|it| it.trim());
-        let command = command_and_arg_iter.next().unwrap();
+        let command = command_and_arg_iter.next().unwrap().to_ascii_lowercase();
         // todo: separate these commands into their own function
-        match command {
+        match &command[..] {
             "" => {}
             "put" => {
                 let mut request = PutRequest::default();
