@@ -4,7 +4,7 @@ extern crate log;
 mod store;
 mod kv_server;
 
-use std::io::Read;
+use std::io::{Read, Write};
 use std::sync::Arc;
 use std::{io, thread};
 use futures::{
@@ -14,13 +14,16 @@ use futures::{
 };
 use grpcio::{ChannelBuilder, Environment, ResourceQuota, ServerBuilder};
 use std::collections::HashMap;
-use std::fs::OpenOptions;
+use std::fs::{OpenOptions, File};
 use std::env::args;
 use std::str::FromStr;
 use crate::store::Store;
 use crate::kv_server::KVServer;
+use pprof::protos::Message;
 
 fn main() {
+    // todo: disable this when not configured
+    let guard = pprof::ProfilerGuard::new(100).unwrap();
     env_logger::init();
     // todo: maybe make cq_count configurable
     let env = Arc::new(Environment::new(1));
@@ -64,4 +67,12 @@ fn main() {
     });
     let _ = block_on(rx);
     let _ = block_on(server.shutdown().compat());
+    if let Ok(report) = guard.report().build() {
+        let mut file = File::create("profile.pb").unwrap();
+        let profile = report.pprof().unwrap();
+
+        let mut content = Vec::new();
+        profile.encode(&mut content).unwrap();
+        file.write_all(&content).unwrap();
+    };
 }

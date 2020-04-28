@@ -2,3 +2,5 @@
 /rpc/target
 .idea
 minikv.log
+profile.pb
+profile*.svg

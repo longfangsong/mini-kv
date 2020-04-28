@@ -98,8 +98,8 @@ fn main() {
                         let response = client.scan(&request);
                         if let Ok(resp) = response {
                             println!("cursor: {}", resp.cursor);
-                            for (i, key) in resp.result.iter().enumerate() {
-                                println!("({}): {}", i, from_utf8(key).unwrap_or("<non-printable>"));
+                            for (i, result_key) in resp.result.iter().enumerate() {
+                                println!("({}): {}", key as usize + i, from_utf8(result_key).unwrap_or("<non-printable>"));
                             }
                         } else {
                             eprintln!("{}", response.unwrap_err());

@@ -25,3 +25,11 @@ Use the grpc interface in programs.
 ### Design detail
 
 Please view [design doc](./doc/design.md)
+
+### benchmark
+
+1600079 request in 319 seconds.
+
+QPS: 5015
+
+For compare, normal Redis's QPS is around 45000.

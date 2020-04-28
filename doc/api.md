@@ -64,7 +64,7 @@ Use following commands to interact with server:
 
 ##### Return
 
-- The value which the key associated to
+- The value which the key associated to. In the repl environment, if the respond is not a utf-8 string, it will display as `<non-printable>`.
 
 ##### Error
 
@@ -108,7 +108,7 @@ Return nothing
 ##### Return
 
 - Next cursor to use, if this value is 0, it means all keys have been scanned.
-- A set of keys.
+- A set of keys. In the repl environment, if a key is not a utf-8 string, it will display as `<non-printable>`.
 
 ##### Error
 
