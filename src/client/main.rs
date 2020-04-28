@@ -1,10 +1,11 @@
 use grpcio::{ChannelBuilder, EnvBuilder};
 use std::sync::Arc;
 use rpc::minikv_grpc::MiniKvServerClient;
-use rpc::minikv::{GetRequest, PutRequest, DeleteRequest, GetResponse, PutResponse, DeleteResponse, ScanResponse, ScanRequest};
+use rpc::minikv::{GetRequest, PutRequest, DeleteRequest, ScanRequest};
 use std::io::{stdin, BufRead, stdout};
 use std::str::{from_utf8, FromStr};
 use std::io::Write;
+use mini_kv::shared::bytes::get_bytes_with_fill;
 
 fn main() {
     let env = Arc::new(EnvBuilder::new().build());
@@ -23,16 +24,12 @@ fn main() {
             "" => {}
             "put" => {
                 let mut request = PutRequest::default();
-                // todo: warn when key_str.len() != 8
                 if let Some(arg1) = command_and_arg_iter.next() {
                     let key_str = arg1.as_bytes();
                     if key_str.len() != 8 {
                         println!("waring: key must be 8 bytes long, will padding/truncate to 8 bytes")
                     }
-                    let mut key = vec![];
-                    for i in 0..8 {
-                        key.push(key_str.get(i).cloned().unwrap_or(0x00u8))
-                    }
+                    let key = get_bytes_with_fill(key_str, 8, 0x00);
                     request.set_key(key);
                     if let Some(arg2) = command_and_arg_iter.next() {
                         let value_str = arg2.as_bytes();
@@ -61,13 +58,9 @@ fn main() {
             }
             "get" => {
                 let mut request = GetRequest::default();
-                // todo: warn when key_str.len() != 8
                 if let Some(arg) = command_and_arg_iter.next() {
                     let key_str = arg.as_bytes();
-                    let mut key = vec![];
-                    for i in 0..8 {
-                        key.push(key_str.get(i).cloned().unwrap_or(0x00u8))
-                    }
+                    let key = get_bytes_with_fill(key_str, 8, 0x00);
                     request.set_key(key);
                     let response = client.get(&request);
                     if let Ok(resp) = response {
@@ -85,7 +78,6 @@ fn main() {
             }
             "delete" => {
                 let mut request = DeleteRequest::default();
-                // todo: warn when key_str.len() != 8
                 let key_str = command_and_arg_iter.next().unwrap().as_bytes();
                 let mut key = vec![];
                 for i in 0..8 {

@@ -3,7 +3,6 @@ use std::io::{Read, Write};
 use std::sync::Arc;
 use std::{io, thread};
 use std::path::Path;
-
 use futures::{
     channel::oneshot,
     executor::block_on,
@@ -15,6 +14,7 @@ use futures_locks::Mutex;
 use std::collections::HashMap;
 use std::fs::{File, OpenOptions};
 use std::env::args;
+use mini_kv::shared::bytes::copy_bytes;
 
 #[derive(Clone)]
 struct KVServer {
@@ -33,13 +33,8 @@ impl rpc::minikv_grpc::MiniKvServer for KVServer {
     fn get(&mut self, ctx: RpcContext<'_>, req: GetRequest, sink: UnarySink<GetResponse>) {
         let mut response = GetResponse::default();
         let mut key = [0u8; 8];
-        for (i, v) in req.key.iter().enumerate() {
-            if let Some(r) = key.get_mut(i) {
-                *r = *v;
-            } else {
-                break;
-            }
-        }
+        // todo: return error when req.get_key().len() != 8
+        copy_bytes(req.get_key(), &mut key);
         let f = self.store.lock()
             .then(move |it| {
                 let guard = it.unwrap();
@@ -59,33 +54,25 @@ impl rpc::minikv_grpc::MiniKvServer for KVServer {
 
     fn put(&mut self, ctx: RpcContext<'_>, req: PutRequest, sink: UnarySink<PutResponse>) {
         let mut response = PutResponse::default();
+        response.set_success(true);
+        let mut error_messages = vec![];
+        if req.get_key().len() != 8 {
+            response.set_success(false);
+            error_messages.push("the key must be 8 bytes, padding if necessary".to_string());
+        }
+        if req.get_value().len() != 256 {
+            response.set_success(false);
+            error_messages.push("the key must be 256 bytes, padding if necessary".to_string());
+        }
+        if !error_messages.is_empty() {
+            let error_message = error_messages.join("\n");
+            response.set_errorMessage(error_message);
+        }
         let mut key = [0u8; 8];
         let mut value = [0u8; 256];
-        response.set_success(true);
-        for (i, v) in req.key.iter().enumerate() {
-            if let Some(r) = key.get_mut(i) {
-                *r = *v;
-            } else {
-                response.set_success(false);
-                response.set_errorMessage("the key must be 8 bytes, padding if necessary".to_string());
-                break;
-            }
-        }
-        for (i, v) in req.value.iter().enumerate() {
-            if let Some(r) = value.get_mut(i) {
-                *r = *v;
-            } else {
-                response.set_success(false);
-                let mut error_message = String::new();
-                if !response.get_errorMessage().is_empty() {
-                    error_message += response.get_errorMessage();
-                    error_message += "\n";
-                }
-                response.errorMessage += "the key must be 256 bytes, padding if necessary";
-                response.set_errorMessage(error_message);
-                break;
-            }
-        }
+        copy_bytes(req.get_key(), &mut key);
+        copy_bytes(req.get_value(), &mut value);
+
         if response.get_success() {
             let log = self.log.clone();
             let f = self.store.lock()
@@ -120,13 +107,8 @@ impl rpc::minikv_grpc::MiniKvServer for KVServer {
     fn delete(&mut self, ctx: RpcContext<'_>, req: DeleteRequest, sink: UnarySink<DeleteResponse>) {
         let mut response = DeleteResponse::default();
         let mut key = [0u8; 8];
-        for (i, v) in req.key.iter().enumerate() {
-            if let Some(r) = key.get_mut(i) {
-                *r = *v;
-            } else {
-                break;
-            }
-        }
+        // todo: return error when req.get_key().len() != 8
+        copy_bytes(req.get_key(), &mut key);
         let log = self.log.clone();
         let f = self.store.lock()
             .map(move |mut it| {
