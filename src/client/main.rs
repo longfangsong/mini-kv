@@ -6,10 +6,13 @@ use std::io::{stdin, BufRead, stdout};
 use std::str::{from_utf8, FromStr};
 use std::io::Write;
 use mini_kv::shared::bytes::get_bytes_with_fill;
+use std::env::args;
 
 fn main() {
     let env = Arc::new(EnvBuilder::new().build());
-    let ch = ChannelBuilder::new(env).connect("localhost:5884");
+    let mut args = args();
+    let address = args.nth(1).unwrap_or_else(|| "localhost:5884".to_string());
+    let ch = ChannelBuilder::new(env).connect(&address);
     let client = MiniKvServerClient::new(ch);
     loop {
         let mut command_and_arg = String::new();

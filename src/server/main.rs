@@ -15,6 +15,7 @@ use std::collections::HashMap;
 use std::fs::{File, OpenOptions};
 use std::env::args;
 use mini_kv::shared::bytes::copy_bytes;
+use std::str::FromStr;
 
 #[derive(Clone)]
 struct KVServer {
@@ -197,7 +198,7 @@ impl KVServer {
 }
 
 fn main() {
-    // todo: make cq_count configurable
+    // todo: maybe make cq_count configurable
     let env = Arc::new(Environment::new(1));
     let mut args = args();
     let server = if let Some(path) = args.nth(1) {
@@ -211,10 +212,16 @@ fn main() {
     let service = rpc::minikv_grpc::create_mini_kv_server(server);
     let quota = ResourceQuota::new(Some("MiniKVServerQuota")).resize_memory(1024 * 1024);
     let ch_builder = ChannelBuilder::new(env.clone()).set_resource_quota(quota);
-
+    let host = std::env::var("HOST").unwrap_or_else(|_| "127.0.0.1".to_string());
+    let port = std::env::var("PORT")
+        .map(|s| u16::from_str(&s).unwrap_or_else(|_| {
+            eprintln!("PORT is not valid");
+            panic!("PORT is not valid");
+        }))
+        .unwrap_or_else(|_| 5884);
     let mut server = ServerBuilder::new(env)
         .register_service(service)
-        .bind("127.0.0.1", 5884)
+        .bind(host, port)
         .channel_args(ch_builder.build_args())
         .build()
         .unwrap();
