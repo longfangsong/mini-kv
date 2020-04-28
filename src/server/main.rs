@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate log;
+
 mod store;
 mod kv_server;
 
@@ -18,6 +21,7 @@ use crate::store::Store;
 use crate::kv_server::KVServer;
 
 fn main() {
+    env_logger::init();
     // todo: maybe make cq_count configurable
     let env = Arc::new(Environment::new(1));
     let mut args = args();
@@ -28,7 +32,9 @@ fn main() {
         .read(true)
         .write(true)
         .open(log_path)
-        .unwrap();
+        .unwrap_or_else(|_| {
+            panic!("Cannot read or create log file!")
+        });
     let store = Store::new(HashMap::new(), log_file);
     let server = KVServer::new(store);
     let service = rpc::minikv_grpc::create_mini_kv_server(server);
@@ -48,7 +54,7 @@ fn main() {
         .unwrap();
     server.start();
     for (host, port) in server.bind_addrs() {
-        println!("listening on {}:{}", host, port);
+        info!("listening on {}:{}", host, port);
     }
     let (tx, rx) = oneshot::channel();
     thread::spawn(move || {

@@ -15,9 +15,12 @@ pub struct KVServer {
 
 impl rpc::minikv_grpc::MiniKvServer for KVServer {
     fn get(&mut self, ctx: RpcContext<'_>, req: GetRequest, sink: UnarySink<GetResponse>) {
+        debug!("GET {:?}", req.key);
         let mut response = GetResponse::default();
         let mut key = [0u8; 8];
-        // todo: return error when req.get_key().len() != 8
+        if req.key.len() != 8 {
+            warn!("Get is called with a key {:?} which length is not 8, will padding/truncate it to 8 bytes", req.key)
+        }
         copy_bytes(req.get_key(), &mut key);
         let lock = self.store.clone();
         let f = lock.lock()
@@ -33,56 +36,45 @@ impl rpc::minikv_grpc::MiniKvServer for KVServer {
             }).then(move |response| {
             let response = response.unwrap();
             sink.success(response)
-                .map_err(move |e| println!("failed to reply {:?}: {:?}", req, e))
+                .map_err(move |e| error!("failed to reply {:?}: {:?}", req, e))
                 .map(|_| ())
         });
         ctx.spawn(f)
     }
 
     fn put(&mut self, ctx: RpcContext<'_>, req: PutRequest, sink: UnarySink<PutResponse>) {
+        debug!("PUT {:?}", req.key);
         let mut response = PutResponse::default();
         response.set_success(true);
-        let mut error_messages = vec![];
-        if req.get_key().len() != 8 {
-            response.set_success(false);
-            error_messages.push("the key must be 8 bytes, padding if necessary".to_string());
-        }
-        if req.get_value().len() != 256 {
-            response.set_success(false);
-            error_messages.push("the key must be 256 bytes, padding if necessary".to_string());
-        }
-        if !error_messages.is_empty() {
-            let error_message = error_messages.join("\n");
-            response.set_errorMessage(error_message);
-        }
         let mut key = [0u8; 8];
         let mut value = [0u8; 256];
-        copy_bytes(req.get_key(), &mut key);
-        copy_bytes(req.get_value(), &mut value);
-
-        if response.get_success() {
-            let f = self.store.lock()
-                .map(move |mut it| {
-                    it.put(key, value);
-                })
-                .then(|_| {
-                    sink.success(response)
-                        .map_err(move |e| println!("failed to reply {:?}: {:?}", req, e))
-                        .map(|_| ())
-                });
-            ctx.spawn(f);
-        } else {
-            let f = sink.success(response)
-                .map_err(move |e| println!("failed to reply {:?}: {:?}", req, e))
-                .map(|_| ());
-            ctx.spawn(f);
+        if req.key.len() != 8 {
+            warn!("Put is called with a key {:?} which length is not 8, will padding/truncate it to 8 bytes", req.key)
         }
+        copy_bytes(&req.key, &mut key);
+        if req.value.len() != 8 {
+            warn!("Put is called with a value {:?} which length is not 256, will padding/truncate it to 8 bytes", req.value)
+        }
+        copy_bytes(&req.value, &mut value);
+        let f = self.store.lock()
+            .map(move |mut it| {
+                it.put(key, value);
+            })
+            .then(move |_| {
+                sink.success(response)
+                    .map_err(move |e| error!("failed to reply {:?}: {:?}", req, e))
+                    .map(|_| ())
+            });
+        ctx.spawn(f);
     }
 
     fn delete(&mut self, ctx: RpcContext<'_>, req: DeleteRequest, sink: UnarySink<DeleteResponse>) {
+        debug!("DELETE {:?}", req.key);
         let mut response = DeleteResponse::default();
         let mut key = [0u8; 8];
-        // todo: return error when req.get_key().len() != 8
+        if req.key.len() != 8 {
+            warn!("Delete is called with a key {:?} which length is not 8, will padding/truncate it to 8 bytes", req.key)
+        }
         copy_bytes(req.get_key(), &mut key);
         let f = self.store.lock()
             .map(move |mut guard| {
@@ -96,13 +88,14 @@ impl rpc::minikv_grpc::MiniKvServer for KVServer {
                     response.set_errorMessage("key not found".to_string());
                 }
                 sink.success(response)
-                    .map_err(move |e| println!("failed to reply {:?}: {:?}", req, e))
+                    .map_err(move |e| error!("failed to reply {:?}: {:?}", req, e))
                     .map(|_| ())
             });
         ctx.spawn(f)
     }
 
     fn scan(&mut self, ctx: RpcContext<'_>, req: ScanRequest, sink: UnarySink<ScanResponse>) {
+        debug!("SCAN at index: {:?}", req.cursor);
         let mut response = ScanResponse::default();
         let f = self.store.lock()
             .map(move |guard| {
@@ -115,7 +108,7 @@ impl rpc::minikv_grpc::MiniKvServer for KVServer {
                 .collect();
             response.set_result(keys.into());
             sink.success(response)
-                .map_err(move |e| println!("failed to reply: {:?}", e))
+                .map_err(move |e| error!("failed to reply: {:?}", e))
                 .map(|_| ())
         });
         ctx.spawn(f)

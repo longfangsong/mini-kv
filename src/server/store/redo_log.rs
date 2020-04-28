@@ -7,20 +7,26 @@ pub trait RedoLog: Send {
     fn redo(&mut self, store: &mut dyn MemStore);
 }
 
+fn log_error_handler(err: std::io::Error) {
+    error!("write redolog failed: {:?}", err)
+}
+
+fn redo_error_handler(err: std::io::Error) {
+    error!("read redolog failed: {:?}", err)
+}
+
 impl<T: Read + Write + Send> RedoLog for T {
     fn log_put(&mut self, key: &[u8; 8], value: &[u8; 256]) {
-        // todo: error handling
-        self.write_all(b"   put").unwrap_or(());
-        self.write_all(key).unwrap_or(());
-        self.write_all(value).unwrap_or(());
+        self.write_all(b"   put").unwrap_or_else(log_error_handler);
+        self.write_all(key).unwrap_or_else(log_error_handler);
+        self.write_all(value).unwrap_or_else(log_error_handler);
         self.flush().unwrap_or(());
     }
 
     fn log_delete(&mut self, key: &[u8; 8]) {
-        // todo: error handling
-        self.write_all(b"delete").unwrap_or(());
-        self.write_all(key).unwrap_or(());
-        self.flush().unwrap_or(());
+        self.write_all(b"delete").unwrap_or_else(log_error_handler);
+        self.write_all(key).unwrap_or_else(log_error_handler);
+        self.flush().unwrap_or_else(log_error_handler);
     }
 
     fn redo(&mut self, store: &mut dyn MemStore) {
@@ -29,18 +35,19 @@ impl<T: Read + Write + Send> RedoLog for T {
             match &op {
                 b"   put" => {
                     let mut key = [0u8; 8];
-                    self.read_exact(&mut key).unwrap_or(());
+                    self.read_exact(&mut key).unwrap_or_else(redo_error_handler);
                     let mut value = [0u8; 256];
-                    self.read_exact(&mut value).unwrap_or(());
+                    self.read_exact(&mut value).unwrap_or_else(redo_error_handler);
                     store.put(key, value);
                 }
                 b"delete" => {
                     let mut key = [0u8; 8];
-                    self.read_exact(&mut key).unwrap_or(());
+                    self.read_exact(&mut key).unwrap_or_else(redo_error_handler);
                     store.delete(key);
                 }
                 _ => {
-                    // todo: log error
+                    error!("invalid op in redo_log!");
+                    return;
                 }
             }
         }

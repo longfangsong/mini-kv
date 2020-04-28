@@ -10,6 +10,8 @@ grpcio = "0.5.1"
 futures = {version = "0.3.4", features = ["compat"]}
 futures01 = { package = "futures", version = "0.1"}
 futures-locks = "0.5.0"
+log = "0.4.8"
+env_logger = "0.7.1"
 
 [[bin]]
 name = "server"
