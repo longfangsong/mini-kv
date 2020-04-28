@@ -1,8 +1,14 @@
 # API
 
-The server exports a grpc api.
+The server exports a grpc API.
 
 You can view the `minikv.proto` [here](../rpc/minikv.proto) to know the grpc interface.
+
+## Build requests
+
+This project can be built by using `cargo 1.43.0 (3532cf738 2020-03-17)` and `rustc 1.43.0 (4fb7144ed 2020-04-20)` on macOS 10.14.6.
+
+Other platforms are not tested, but very likely to work.
 
 ## Cli
 

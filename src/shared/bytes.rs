@@ -28,3 +28,17 @@ pub fn get_bytes_with_fill(from: &[u8], n: usize, fill: u8) -> Vec<u8> {
     }
     result
 }
+
+/// check whether byte slices are equal
+pub fn bytes_equal(lhs: &[u8], rhs: &[u8]) -> bool {
+    if lhs.len() != rhs.len() {
+        false
+    } else {
+        for (l, r) in lhs.iter().zip(rhs.iter()) {
+            if l != r {
+                return false;
+            }
+        }
+        true
+    }
+}
