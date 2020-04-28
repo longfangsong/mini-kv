@@ -1,11 +1,24 @@
 use std::collections::{HashMap, BTreeMap};
 use std::cmp::min;
 
+/// An abstraction of Key-Value storage in memory
+/// Works like `HashMap<[u8; 8], [u8; 256]>` with some other features like scan
 pub trait MemStore: Send {
+    /// put a (key, value) pair into the storage
+    /// replace the old pair with key if exists
     fn put(&mut self, key: [u8; 8], value: [u8; 256]);
+
+    /// get the value associated with key
+    /// return `None` if key not exists
     // don't remove & here, need this to infer lifetime
     fn get(&self, key: &[u8; 8]) -> Option<&[u8; 256]>;
+
+    /// delete the (`key`, `value`) pair
+    /// return `None` if key not exists, else return the `value`
     fn delete(&mut self, key: [u8; 8]) -> Option<[u8; 256]>;
+
+    /// scan at most `count` keys start at cursor `at`
+    /// return the new cursor and the keys it scanned
     fn scan(&self, at: usize, count: usize) -> (usize, Vec<[u8; 8]>);
 }
 
@@ -75,6 +88,7 @@ fn test_hashmap_store() {
     do_test(&mut store);
 }
 
+// it's sad that Rust doesn't provide an abstraction over HashMap and BTreeMap
 impl MemStore for BTreeMap<[u8; 8], [u8; 256]> {
     fn put(&mut self, key: [u8; 8], value: [u8; 256]) {
         self.insert(key, value);

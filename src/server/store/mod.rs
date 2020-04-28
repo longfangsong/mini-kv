@@ -22,7 +22,7 @@ impl Store {
 
     pub fn put(&mut self, key: [u8; 8], value: [u8; 256]) {
         self.mem_store.put(key, value);
-        self.redo_log.log_put(&key, &value);
+        self.redo_log.log_put(key, &value);
     }
     pub fn get(&self, key: &[u8; 8]) -> Option<&[u8; 256]> {
         self.mem_store.get(key)
@@ -30,7 +30,7 @@ impl Store {
     pub fn delete(&mut self, key: [u8; 8]) -> Option<[u8; 256]> {
         let result = self.mem_store.delete(key);
         if result.is_some() {
-            self.redo_log.log_delete(&key);
+            self.redo_log.log_delete(key);
         }
         result
     }

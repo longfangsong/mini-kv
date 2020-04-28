@@ -1,9 +1,15 @@
 use std::io::{Write, Read};
 use crate::store::mem_store::MemStore;
 
+/// An abstraction of RedoLog written by this kv store service
 pub trait RedoLog: Send {
-    fn log_put(&mut self, key: &[u8; 8], value: &[u8; 256]);
-    fn log_delete(&mut self, key: &[u8; 8]);
+    /// write a put command into log
+    fn log_put(&mut self, key: [u8; 8], value: &[u8; 256]);
+
+    /// write a delete command into log
+    fn log_delete(&mut self, key: [u8; 8]);
+
+    /// redo all the logs on store
     fn redo(&mut self, store: &mut dyn MemStore);
 }
 
@@ -16,16 +22,16 @@ fn redo_error_handler(err: std::io::Error) {
 }
 
 impl<T: Read + Write + Send> RedoLog for T {
-    fn log_put(&mut self, key: &[u8; 8], value: &[u8; 256]) {
+    fn log_put(&mut self, key: [u8; 8], value: &[u8; 256]) {
         self.write_all(b"   put").unwrap_or_else(log_error_handler);
-        self.write_all(key).unwrap_or_else(log_error_handler);
+        self.write_all(&key).unwrap_or_else(log_error_handler);
         self.write_all(value).unwrap_or_else(log_error_handler);
         self.flush().unwrap_or(());
     }
 
-    fn log_delete(&mut self, key: &[u8; 8]) {
+    fn log_delete(&mut self, key: [u8; 8]) {
         self.write_all(b"delete").unwrap_or_else(log_error_handler);
-        self.write_all(key).unwrap_or_else(log_error_handler);
+        self.write_all(&key).unwrap_or_else(log_error_handler);
         self.flush().unwrap_or_else(log_error_handler);
     }
 
@@ -66,17 +72,17 @@ fn test_file() {
     let key = *b"00000001";
     let mut value = [0u8; 256];
     copy_bytes(b"a", &mut value);
-    file.log_put(&key, &value);
+    file.log_put(key, &value);
     let key = *b"00000002";
     let mut value = [0u8; 256];
     copy_bytes(b"b", &mut value);
-    file.log_put(&key, &value);
+    file.log_put(key, &value);
     let key = *b"00000001";
     let mut value = [0u8; 256];
     copy_bytes(b"c", &mut value);
-    file.log_put(&key, &value);
+    file.log_put(key, &value);
     let key = *b"00000002";
-    file.log_delete(&key);
+    file.log_delete(key);
 
     let mut store = HashMap::new();
     let mut file = file.reopen().unwrap();
