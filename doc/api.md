@@ -2,6 +2,8 @@
 
 The server exports a grpc API.
 
+Since the grpc API is clear and easy enough for using, I didn't see the value in wrapping it.
+
 You can view the `minikv.proto` [here](../rpc/minikv.proto) to know the grpc interface.
 
 ## Build requests

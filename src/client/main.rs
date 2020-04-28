@@ -39,10 +39,7 @@ fn main() {
                         if value_str.len() != 256 {
                             println!("waring: value must be 256 bytes long, will padding/truncate to 256 bytes");
                         }
-                        let mut value = vec![];
-                        for i in 0..256 {
-                            value.push(value_str.get(i).cloned().unwrap_or(0x00u8))
-                        }
+                        let value = get_bytes_with_fill(value_str, 256, 0x00);
                         request.set_value(value);
                         let response = client.put(&request);
                         if let Ok(resp) = response {
@@ -82,10 +79,7 @@ fn main() {
             "delete" => {
                 let mut request = DeleteRequest::default();
                 let key_str = command_and_arg_iter.next().unwrap().as_bytes();
-                let mut key = vec![];
-                for i in 0..8 {
-                    key.push(key_str.get(i).cloned().unwrap_or(0x00u8))
-                }
+                let key = get_bytes_with_fill(key_str, 8, 0x00);
                 request.set_key(key);
                 let response = client.delete(&request);
                 if let Ok(resp) = response {
@@ -117,6 +111,7 @@ fn main() {
                     eprintln!("Scan needs a cursor! Use 0 if you want to scan from the start.");
                 }
             }
+            "exit" => break,
             &_ => println!("Invalid command")
         }
     }

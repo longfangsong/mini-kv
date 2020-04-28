@@ -51,8 +51,8 @@ impl rpc::minikv_grpc::MiniKvServer for KVServer {
             warn!("Put is called with a key {:?} which length is not 8, will padding/truncate it to 8 bytes", req.key)
         }
         copy_bytes(&req.key, &mut key);
-        if req.value.len() != 8 {
-            warn!("Put is called with a value {:?} which length is not 256, will padding/truncate it to 8 bytes", req.value)
+        if req.value.len() != 256 {
+            warn!("Put is called with a value {:?} which length is not 256, will padding/truncate it to 256 bytes", req.value)
         }
         copy_bytes(&req.value, &mut value);
         let f = self.store.write()
