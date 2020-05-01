@@ -22,8 +22,11 @@ use crate::kv_server::KVServer;
 use pprof::protos::Message;
 
 fn main() {
-    // todo: disable this when not configured
-    let guard = pprof::ProfilerGuard::new(100).unwrap();
+    let guard = if cfg!(profile) {
+        Some(pprof::ProfilerGuard::new(100).unwrap())
+    } else {
+        None
+    };
     env_logger::init();
     // todo: maybe make cq_count configurable
     let env = Arc::new(Environment::new(1));
@@ -67,12 +70,15 @@ fn main() {
     });
     let _ = block_on(rx);
     let _ = block_on(server.shutdown().compat());
-    if let Ok(report) = guard.report().build() {
-        let mut file = File::create("profile.pb").unwrap();
-        let profile = report.pprof().unwrap();
+    if cfg!(profile) {
+        let guard = guard.unwrap();
+        if let Ok(report) = guard.report().build() {
+            let mut file = File::create("profile.pb").unwrap();
+            let profile = report.pprof().unwrap();
 
-        let mut content = Vec::new();
-        profile.encode(&mut content).unwrap();
-        file.write_all(&content).unwrap();
-    };
+            let mut content = Vec::new();
+            profile.encode(&mut content).unwrap();
+            file.write_all(&content).unwrap();
+        };
+    }
 }

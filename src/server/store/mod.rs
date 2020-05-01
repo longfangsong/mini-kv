@@ -10,9 +10,13 @@ pub struct Store {
 }
 
 impl Store {
-    pub fn new<S: 'static + MemStore, L: 'static + RedoLog>(mem_store: S, redo_log: L) -> Self {
+    pub fn new<S: 'static + MemStore, L: 'static + RedoLog>(
+        mem_store: S,
+        redo_log: L,
+    ) -> Self {
         let mut mem_store = mem_store;
         let mut redo_log = redo_log;
+        // todo: remove this when impl based on lsm-tree is ready
         redo_log.redo(&mut mem_store);
         Self {
             mem_store: Box::new(mem_store),

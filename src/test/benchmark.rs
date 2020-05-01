@@ -11,8 +11,6 @@ use rpc::minikv::{PutRequest, GetRequest, DeleteRequest, ScanRequest};
 use rand::Rng;
 use std::{thread, io};
 use std::io::Read;
-use std::borrow::Borrow;
-use std::ops::Deref;
 
 /// simulate pressure for the server
 fn main() {

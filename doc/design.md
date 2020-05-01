@@ -4,7 +4,7 @@
 
 ![arch](design/arch.png)
 
-As the image shows, this is a stadard Client-Server architecture. The server and the client(s) communicate with each other with grpc.
+As the image shows, this is a standard Client-Server architecture. The server and the client(s) communicate with each other with grpc.
 
 The server contains a grpcServer component and a store, which is made up of in-memory store component and logging component.
 

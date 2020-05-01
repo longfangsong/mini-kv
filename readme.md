@@ -4,7 +4,7 @@ A demo key-value database.
 
 ## How to use & How to build
 
-Please view [API doc](./doc/api.md)
+Please view [API doc](./doc/api.md).
 
 ## Design (Current, may change later)
 
@@ -12,7 +12,9 @@ Please view [API doc](./doc/api.md)
 
 The server stores the data in a plain `HashMap<Key, Value>`.
 
-Also writes into a log file for each write operation.
+Plan to change this into lsm-tree.
+
+Also writes into a redo-log file for each write operation.
 
 ### Client
 
@@ -27,6 +29,8 @@ Use the grpc interface in programs.
 Please view [design doc](./doc/design.md)
 
 ### benchmark
+
+put:get:delete:scan = 4:4:1:1
 
 1600079 request in 319 seconds.
 
