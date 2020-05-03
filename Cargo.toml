@@ -1,32 +1,15 @@
 [package]
-name = "mini-kv"
+name = "kvs"
 version = "0.1.0"
 authors = ["longfangsong <longfangsong@icloud.com>"]
+description = "A key-value store"
 edition = "2018"
 
 [dependencies]
-rpc = { path = "rpc" }
-grpcio = "0.5.1"
-futures = {version = "0.3.4", features = ["compat"]}
-futures01 = { package = "futures", version = "0.1"}
-futures-locks = "0.5.0"
-log = "0.4.8"
-env_logger = "0.7.1"
-pprof = {version = "0.3.16", features = ["flamegraph","protobuf"]}
-rand = "0.7.3"
-
-[[bin]]
-name = "server"
-path = "src/server/main.rs"
-
-[[bin]]
-name = "client"
-path = "src/client/main.rs"
-
-[[bin]]
-name = "benchmark-pressure"
-path = "src/test/benchmark.rs"
+clap = "2.33.0"
 
 [dev-dependencies]
-tempfile = "3.1.0"
+assert_cmd = "1.0.1"
+predicates = "1.0.4"
+
 
