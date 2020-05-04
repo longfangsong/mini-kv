@@ -7,9 +7,13 @@ edition = "2018"
 
 [dependencies]
 clap = "2.33.0"
+bincode = "1.2.1"
+serde = {version="1.0.106", features=["derive"]}
 
 [dev-dependencies]
 assert_cmd = "1.0.1"
 predicates = "1.0.4"
+tempfile = "3.1.0"
+walkdir = "2.3.1"
 
 
