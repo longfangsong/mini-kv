@@ -4,3 +4,4 @@
 minikv.log
 profile.pb
 profile*.svg
+*.sst

@@ -7,6 +7,7 @@
 //! Since the length of the input is not a fixed value, a "meta" file is need to
 //! know the offset of each k-v pair in large tree, this approach looks a little like WiscKey
 //! maybe replace with a real lsm-tree in the future
+mod log_entry;
 
 use std::cell::RefCell;
 use std::cmp::Ordering;
@@ -19,14 +20,14 @@ use std::path::{Path, PathBuf};
 use bincode::deserialize_from;
 
 use crate::error::Error;
-use crate::kvstore::log_entry::LogEntry;
-use crate::kvstore::storage::KvStorage;
+use crate::server::storage::lsm_tree::log_entry::LogEntry;
+use crate::server::storage::KvStorage;
 use crate::Result;
 
 /// if small_tree's size is larger than `COMPAT_LIMIT`, a compaction will occur
 /// use a relatively small value to make it easy to debug
 /// need profiling in real use
-const COMPAT_LIMIT: u64 = 4096;
+const COMPAT_LIMIT: u64 = 1024 * 1024;
 
 /// a simplified lsm-tree
 pub struct LSMTree {

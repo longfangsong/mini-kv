@@ -3,6 +3,10 @@ use std::collections::{BTreeMap, HashMap};
 use crate::error::Error;
 use crate::Result;
 
+/// lsm-tree based storage
+pub mod lsm_tree;
+/// sled based storage
+pub mod sled;
 /// an abstraction over key-value storage
 pub trait KvStorage {
     /// Sets the value of a string key to a string.
