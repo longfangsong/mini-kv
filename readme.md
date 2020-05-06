@@ -2,6 +2,12 @@
 
 A demo key-value database.
 
+## v2
+
+Due to the homework time is up, I'll not make any change to master branch for now.
+
+But a better version of this project is in the `v2` branch, which is built up according to the PingCAP talent plan.
+
 ## How to use & How to build
 
 Please view [API doc](./doc/api.md).
